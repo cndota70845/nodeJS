@@ -18,6 +18,10 @@
 const http = require('http');
 //解析GET请求参数；
 const url = require('url');
+//
+const methods = require('./modules/methods.js');
+
+methods.test();
 
 http.createServer((req,res) => {
     res.writeHead(200, {"Content-Type": "text/html;charset = 'utf-8'"});
@@ -25,7 +29,7 @@ http.createServer((req,res) => {
 
     if (req.url !== '/favicon.ico') {
         const quary = url.parse(req.url,true).query;
-        res.write(`<h2>姓名：${quary.name},年龄：${quary.age},网站欢迎你</h2>`)
+        res.write(`<h2>姓名：${quary.name},年龄：${quary.age},网站欢迎你</h2>`);
     }
 
     res.end();
