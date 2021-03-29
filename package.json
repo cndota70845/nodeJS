@@ -1,0 +1,28 @@
+{
+  "name": "nodeJS",
+  "version": "1.0.0",
+  "description": "",
+  "main": "koa.js",
+  "dependencies": {
+    "koa": "^2.13.1",
+    "koa-bodyparser": "^4.3.0",
+    "koa-router": "^10.0.0",
+    "md5": "^2.3.0",
+    "silly-datetime": "^0.1.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "dev": "supervisor koa.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cndota70845/nodeJS.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cndota70845/nodeJS/issues"
+  },
+  "homepage": "https://github.com/cndota70845/nodeJS#readme"
+}

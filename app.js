@@ -18,19 +18,30 @@
 const http = require('http');
 //解析GET请求参数；
 const url = require('url');
-//
+//引入MD5模块；
+const md5 = require('md5');
+
 const methods = require('./modules/methods.js');
 
+const sd = require('silly-datetime');
+
 methods.test();
+// methods.FS();
+// methods.readFile();
+methods.getArr();
 
 http.createServer((req,res) => {
     res.writeHead(200, {"Content-Type": "text/html;charset = 'utf-8'"});
     res.write(`<header><meta charset="UTF-8"></header>`);
-
+    function init () {
+        var btn = document.getElementById('btn');
+        btn.addEventListener('click',methods.createFile('css'));
+    }
     if (req.url !== '/favicon.ico') {
         const quary = url.parse(req.url,true).query;
-        res.write(`<h2>姓名：${quary.name},年龄：${quary.age},网站欢迎你</h2>`);
+        res.write(`<h2>姓名：${md5(quary.name)},年龄：${md5(quary.age)},<br>时间是:${sd.format(new Date(), 'YYYY-MM-DD HH:mm')},网站欢迎你</h2>`);
+        res.write(`<button onclick="init()">点击新建一个css文件夹</button>`);
     }
-
     res.end();
 }).listen(8081);
+
