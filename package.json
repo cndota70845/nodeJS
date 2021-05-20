@@ -1,8 +1,8 @@
 {
-  "name": "nodeJS",
+  "name": "nodejs",
   "version": "1.0.0",
   "description": "",
-  "main": "koa.js",
+  "main": "app.js",
   "dependencies": {
     "koa": "^2.13.1",
     "koa-bodyparser": "^4.3.0",
@@ -13,7 +13,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "dev": "supervisor koa.js"
+    "dev": "supervisor app.js"
   },
   "repository": {
     "type": "git",

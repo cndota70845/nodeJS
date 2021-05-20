@@ -17,17 +17,19 @@ app.use(async (ctx,next)=>{
 router.get('/', async (ctx, next) => {
     var params = '/login.html'
 
-    var data = fs.readFile(`./static${params}`,(err,data)=>{
-        if (err) {
-            console.log(err);
-            return;
-        }
-        return data;
-    });
-    console.log(data);
-    ctx.response.status = 200;
-        ctx.response.type = 'text/html';
-        ctx.response.body = data;
+    // var data = fs.readFile(`./static${params}`,(err,data)=>{
+    //     if (err) {
+    //         console.log(err);
+    //         return;
+    //     }
+    //     return data;
+    // });
+    // console.log(data);
+    // ctx.response.status = 200;
+    //     ctx.response.type = 'text/html';
+    //     ctx.response.body = data;
+
+    
     await next();
 });
 

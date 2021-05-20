@@ -1,25 +1,15 @@
 const http = require('http');
-const fs = require('fs');
-const common = require('./modules/common.js');
-const path = require('path');
 
-http.createServer((req,res) => {
-    let params = req.url;
-    console.log(params);
-    if (params == '/') {
-        params = '/login.html';
-    }
-    let extname = path.extname(params);
-    let mime = common.getMime(extname);
-    fs.readFile(`./static${params}`,(err,data)=>{
-        if (err) {
-            res.writeHead(404, {"Content-Type": `${mime};charset = 'utf-8'`});
-            res.write(`<header><meta charset="UTF-8"></header>`);
-            res.end('页面不存在');
-            return;
-        }
-        res.writeHead(200, {"Content-Type": `${mime};charset = 'utf-8'`});
-        res.end(data);
-    });
+const server = http.createServer();
 
-}).listen(3000);
+server.on('request',function (request,response) {
+    response.setHeader('Content-Type', 'text/html; charset=utf-8')
+    response.write('hello');
+    response.write(`<div><h1>你好</h1></div>`);
+    // 告诉客户端，我的话说完了，你可以呈递给用户了
+    response.end();
+});
+
+server.listen(3000, function () {
+    console.log('服务器启动成功了，可以通过 http://127.0.0.1:3000/ 来进行访问')
+});
