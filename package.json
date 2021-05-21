@@ -2,18 +2,19 @@
   "name": "nodejs",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "koa.js",
   "dependencies": {
     "koa": "^2.13.1",
     "koa-bodyparser": "^4.3.0",
     "koa-router": "^10.0.0",
+    "koa-static": "^5.0.0",
     "md5": "^2.3.0",
     "mysql": "^2.18.1",
     "silly-datetime": "^0.1.2"
   },
   "devDependencies": {},
   "scripts": {
-    "dev": "supervisor app.js"
+    "dev": "supervisor koa.js"
   },
   "repository": {
     "type": "git",
