@@ -93,10 +93,22 @@ router.get('/api/getUser', async (ctx, next) => {
     if (ctx.request.query) {
         let query = killNULL(ctx.request.query);
         let data = filterUser (query)
-        ctx.body = data;
+        ctx.body = {code:1,data:data};
     }
     else {
-        ctx.body = user;
+        ctx.body = {code:1,data:user};
+    }
+    await next();
+});
+
+router.get('/api/deleteUser', async (ctx, next) => {
+    var id = ctx.request.query.id;
+    const res = await mysql.remove(id);
+    if (res) {
+        ctx.body = {
+            code:1,
+            msg:'数据删除成功'
+        };
     }
     await next();
 });

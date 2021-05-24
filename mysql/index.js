@@ -57,6 +57,27 @@ class Mysql {
             });
         });
     }
+
+    remove (id) {
+        return new Promise((resolve, reject) => {
+            let sql = `DELETE FROM user where id='${id}'`;
+            pool.getConnection(function (err, connection) {
+                if (err) {
+                    throw err;
+                }
+                else {
+                    connection.query(sql, function (error, results) {
+                        if (error) {
+                            throw error;
+                        }
+                        else {
+                            resolve(results);
+                        }
+                    });
+                }
+            });
+        })
+    }
 }
  
 module.exports = new Mysql()
