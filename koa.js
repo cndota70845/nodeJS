@@ -93,10 +93,16 @@ router.get('/api/getUser', async (ctx, next) => {
     if (ctx.request.query) {
         let query = killNULL(ctx.request.query);
         let data = filterUser (query)
-        ctx.body = {code:1,data:data};
+        ctx.body = {
+            code:1,
+            data:data
+        };
     }
     else {
-        ctx.body = {code:1,data:user};
+        ctx.body = {
+            code:1,
+            data:user
+        };
     }
     await next();
 });
