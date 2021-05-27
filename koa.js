@@ -1,15 +1,14 @@
-const Koa = require('koa'),
-    app = new Koa(),
-    router = require('koa-router')(),
-    bodyParser = require('koa-bodyparser'),
-    mysql = require('./mysql'),
-    path = require('path'),
-    fs = require('fs');
+const Koa = require('koa');
+const app = new Koa();
+const router = require('koa-router')();
+const bodyParser = require('koa-bodyparser');
+const mysql = require('./mysql');
+const path = require('path');
+const fs = require('fs');
+const cors = require('@koa/cors')();
 
+app.use(cors);
 var user = undefined;
-
-const static = require('koa-static');
-app.use(static('./static'));
 
 app.use(async (ctx,next)=>{
     console.log(`Process ${ctx.request.method},${ctx.request.url}`);
@@ -114,6 +113,21 @@ router.get('/api/deleteUser', async (ctx, next) => {
         ctx.body = {
             code:1,
             msg:'数据删除成功'
+        };
+    }
+    await next();
+});
+
+router.post('/api/editUser', async (ctx, next) => {
+    console.log(ctx.request.body);
+    var id = ctx.request.body.id || '',
+        name = ctx.request.body.name || '',
+        password = ctx.request.body.password || '';
+    const res = await mysql.edit({id:id,name:name,password:password});
+    if (res) {
+        ctx.body = {
+            code:1,
+            msg:'修改数据成功'
         };
     }
     await next();

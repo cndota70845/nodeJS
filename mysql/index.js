@@ -15,6 +15,20 @@ class Mysql {
  
     }
 
+    edit (data) {
+        return new Promise((resolve, reject) => {
+            let sql = `UPDATE user SET name='${data.name}',password='${data.password}' WHERE id='${data.id}'`;
+            pool.query(sql, function (error, results) {
+                if (error) {
+                    throw error;
+                }
+                else {
+                    resolve(results);
+                }
+            });
+        }); 
+    }
+
     query () {
         return new Promise((resolve, reject) => {
             let sql = `SELECT * from user`;
