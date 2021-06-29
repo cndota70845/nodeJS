@@ -17,7 +17,8 @@ class Mysql {
 
     edit (data) {
         return new Promise((resolve, reject) => {
-            let sql = `UPDATE user SET name='${data.name}',password='${data.password}' WHERE id='${data.id}'`;
+            let sql = `UPDATE user SET ${data.name?`name='${data.name}',`:''}${data.password?`password='${data.password}'`:''} WHERE id='${data.id}'`;
+            console.log(sql);
             pool.query(sql, function (error, results) {
                 if (error) {
                     throw error;

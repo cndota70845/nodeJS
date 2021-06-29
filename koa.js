@@ -119,11 +119,8 @@ router.get('/api/deleteUser', async (ctx, next) => {
 });
 
 router.post('/api/editUser', async (ctx, next) => {
-    console.log(ctx.request.body);
-    var id = ctx.request.body.id || '',
-        name = ctx.request.body.name || '',
-        password = ctx.request.body.password || '';
-    const res = await mysql.edit({id:id,name:name,password:password});
+    const params = ctx.request.body;
+    const res = await mysql.edit(params);
     if (res) {
         ctx.body = {
             code:1,
