@@ -54,15 +54,6 @@ router.get('/login', async (ctx, next) => {
     await next();
 });
 
-router.get('/user', async (ctx, next) => {
-    ctx.response.body = `<h1>User</h1>
-    <form action="/user" method="post">
-        <p>Name: <input name="name" value=""></p>
-        <p>Password: <input name="password" type="password"></p>
-        <p><input type="submit" value="添加"></p>
-    </form>`;
-});
-
 router.get('/api/getUser', async (ctx, next) => {
     function filterUser (query) {
         return user.filter(function(el) {
@@ -130,11 +121,17 @@ router.post('/api/editUser', async (ctx, next) => {
     await next();
 });
 
-router.post('/user', async (ctx, next) => {
+router.post('/api/addUser', async (ctx, next) => {
     var name = ctx.request.body.name || '',
         password = ctx.request.body.password || '';
         res = await mysql.insert({name:name,password:password});
-    ctx.response.body = `<h1>添加用户，姓名: ${name}, 密码: ${password}</h1><br><a href="/login">去登录</a>`;
+    if (res) {
+        ctx.body = {
+            code:1,
+            msg:'添加数据成功'
+        };
+    }
+    await next();
 });
 
 router.post('/signin', async (ctx, next) => {

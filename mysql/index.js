@@ -14,11 +14,17 @@ class Mysql {
     constructor () {
  
     }
-
+    //改
     edit (data) {
         return new Promise((resolve, reject) => {
-            let sql = `UPDATE user SET ${data.name?`name='${data.name}',`:''}${data.password?`password='${data.password}'`:''} WHERE id='${data.id}'`;
-            console.log(sql);
+            let arr = [];
+            for (let key in data) {
+                if(key!=='id') {
+                    arr.push(`${key}='${data[key]}'`);
+                }
+            }
+            const search = arr.join(',');
+            let sql = `UPDATE user SET ${search} WHERE id='${data.id}'`;
             pool.query(sql, function (error, results) {
                 if (error) {
                     throw error;
@@ -29,7 +35,7 @@ class Mysql {
             });
         }); 
     }
-
+    //查
     query () {
         return new Promise((resolve, reject) => {
             let sql = `SELECT * from user`;
@@ -43,7 +49,7 @@ class Mysql {
             });
         });  
     }
-
+    //增
     insert (data) {
         return new Promise((resolve, reject) => {
             let keyList = [];
@@ -72,7 +78,7 @@ class Mysql {
             });
         });
     }
-
+    //删
     remove (id) {
         return new Promise((resolve, reject) => {
             let sql = `DELETE FROM user where id='${id}'`;
