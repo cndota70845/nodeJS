@@ -8,14 +8,12 @@ const fs = require('fs');
 const cors = require('@koa/cors')();
 
 app.use(cors);
-var user = undefined;
 
 app.use(async (ctx,next)=>{
     console.log(`Process ${ctx.request.method},${ctx.request.url}`);
     ctx.set('Access-Control-Allow-Origin', '*');
     ctx.set('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild');
     ctx.set('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
-    user = await mysql.query();
     if (ctx.method == 'OPTIONS') {
         ctx.body = 200; 
     } 
@@ -55,19 +53,6 @@ router.get('/login', async (ctx, next) => {
 });
 
 router.get('/api/getUser', async (ctx, next) => {
-    function filterUser (query) {
-        return user.filter(function(el) {
-            let choice = true;
-            for (let key in query) {
-                if (el[key] != query[key]) {
-                    choice = false;
-                }
-            }
-            if (choice == true) {
-                return el;
-            }
-        })
-    }
 
     function killNULL (origin) {
         let target = {};
@@ -80,18 +65,23 @@ router.get('/api/getUser', async (ctx, next) => {
         return target;
     }
 
-    if (ctx.request.query) {
-        let query = killNULL(ctx.request.query);
-        let data = filterUser (query)
-        ctx.body = {
-            code:1,
-            data:data
-        };
+    const params = {
+        page:{
+            size: ctx.request.query.page_size,
+            current: ctx.request.query.page_current
+        },
+        search:ctx.request.query.search
+            ? killNULL(ctx.request.query.search)
+            : null
     }
-    else {
+    // console.log(params);
+    const res = await mysql.query(params);
+    if (res) {
+        console.log(res);
         ctx.body = {
             code:1,
-            data:user
+            data:res.data,
+            total:res.total
         };
     }
     await next();
@@ -135,23 +125,7 @@ router.post('/api/addUser', async (ctx, next) => {
 });
 
 router.post('/signin', async (ctx, next) => {
-    var
-        name = ctx.request.body.name || '',
-        password = ctx.request.body.password || '';
-        comfirm = false;
-    user.forEach(item => {
-        console.log(item.name,item.password,name,password)
-        if (item.name === name && String(item.password) === password) {
-            comfirm = true;
-        }   
-    });
-    if (comfirm) {
-        return ctx.response.body = `<h1>Welcome, ${name}!</h1>`;
-    }
-    else {
-        return ctx.response.body = `<h1>Login failed!</h1>
-        <p><a href="./login">Try again</a></p>`;
-    }
+    
 });
 
 app.use(bodyParser());

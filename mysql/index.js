@@ -8,12 +8,48 @@ var options = {
     database : config.database.DATABASE
 }
 
-var pool  = mysql.createPool(options);
+var pool = mysql.createPool(options);
+
+async function getTotal () {
+    var sql_total = `SELECT COUNT(*) FROM user`;
+    const res = await new Promise((resolve, reject) => {
+        pool.query(sql_total,function (error, results) {
+            if (error) {
+                throw error;
+            }
+            else {
+                resolve(results);
+            }
+        });
+    });
+    if (res) {
+        console.log(res);
+    }
+}
+
  
 class Mysql {
     constructor () {
- 
+        this.total = 0;
     }
+
+    async getTotal () {
+        var sql_total = `SELECT COUNT(*) FROM user`;
+        const res = await new Promise((resolve, reject) => {
+            pool.query(sql_total,function (error, results) {
+                if (error) {
+                    throw error;
+                }
+                else {
+                    resolve(results);
+                }
+            });
+        });
+        if (res) {
+            this.total = Object.values(res[0])[0];
+        }
+    }
+
     //改
     edit (data) {
         return new Promise((resolve, reject) => {
@@ -35,16 +71,36 @@ class Mysql {
             });
         }); 
     }
+
     //查
-    query () {
-        return new Promise((resolve, reject) => {
-            let sql = `SELECT * from user`;
+    query (data) {
+        var page_current = data.page.current,
+            size = data.page.size,
+            begin = (page_current - 1)*size,
+            end = page_current*size,
+            search = null;
+        if (JSON.stringify(data.search)!=='{}') {
+            let arr = [];
+            for (let key in data.search) {
+                arr.push(`${key}='${data[key]}'`);
+            }
+            search = arr.join(',');
+        }
+        return new Promise((resolve, reject) => {     
+            const sql = `SELECT * FROM user
+            ORDER BY id
+            LIMIT ${begin},${end}`;
+            this.getTotal();
+            const total = this.total;
             pool.query(sql, function (error, results) {
                 if (error) {
                     throw error;
                 }
                 else {
-                    resolve(results);
+                    resolve({
+                        total:total,
+                        data: results
+                    });
                 }
             });
         });  
@@ -97,7 +153,7 @@ class Mysql {
                     });
                 }
             });
-        })
+        });
     }
 }
  
