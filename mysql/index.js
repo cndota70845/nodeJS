@@ -9,24 +9,6 @@ var options = {
 }
 
 var pool = mysql.createPool(options);
-
-async function getTotal () {
-    var sql_total = `SELECT COUNT(*) FROM user`;
-    const res = await new Promise((resolve, reject) => {
-        pool.query(sql_total,function (error, results) {
-            if (error) {
-                throw error;
-            }
-            else {
-                resolve(results);
-            }
-        });
-    });
-    if (res) {
-        console.log(res);
-    }
-}
-
  
 class Mysql {
     constructor () {
@@ -77,7 +59,6 @@ class Mysql {
         var page_current = data.page.current,
             size = data.page.size,
             begin = (page_current - 1)*size,
-            end = page_current*size,
             search = null;
         if (JSON.stringify(data.search)!=='{}') {
             let arr = [];
@@ -87,9 +68,11 @@ class Mysql {
             search = arr.join(',');
         }
         return new Promise((resolve, reject) => {     
-            const sql = `SELECT * FROM user
-            ORDER BY id
-            LIMIT ${begin},${end}`;
+            const sql = `SELECT * 
+            FROM 
+                user
+            LEFT JOIN file ON user.file = file.file_id
+            LIMIT ${size} OFFSET ${begin}`;
             this.getTotal();
             const total = this.total;
             pool.query(sql, function (error, results) {
@@ -149,6 +132,46 @@ class Mysql {
                         }
                         else {
                             resolve(results);
+                        }
+                    });
+                }
+            });
+        });
+    }
+    //上传
+    upload (obj) {
+        return new Promise((resolve, reject) => {
+            console.log(obj);
+            let keyList = [];
+            let valList = [];
+            for (let key in obj.file) {
+                keyList.push(key);
+                valList.push(`'${obj.file[key]}'`);
+            }
+            console.log(valList);
+            let sql = `INSERT INTO file (${keyList.toString()}) VALUES (${valList.toString()})`;
+
+            pool.getConnection(function (err, connection) {
+                if (err) {
+                    throw err;
+                }
+                else {
+                    connection.query(sql, function (error, results) {
+                        if (error) {
+                            throw error;
+                        }
+                        else {
+                            console.log('results',results.insertId);
+                            const insertId = results.insertId;
+                            let sql_2 = `UPDATE user SET file=${insertId} WHERE id='${obj.id}'`;
+                            connection.query(sql_2, function (error_2, results_2) {
+                                if (error_2) {
+                                    throw error_2;
+                                }
+                                else {
+                                    resolve(results);
+                                }
+                            });
                         }
                     });
                 }

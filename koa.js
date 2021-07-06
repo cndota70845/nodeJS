@@ -1,13 +1,29 @@
 const Koa = require('koa');
 const app = new Koa();
 const router = require('koa-router')();
-const bodyParser = require('koa-bodyparser');
+const koaBody = require('koa-body');
 const mysql = require('./mysql');
-const path = require('path');
 const fs = require('fs');
+const path = require('path');
 const cors = require('@koa/cors')();
 
 app.use(cors);
+
+app.use(koaBody({
+    enableTypes: ['json', 'form', 'text'],
+    multipart: true, // 是否支持 multipart-formdate 的表单
+    formidable: {
+        keepExtensions: true, // 保持文件的后缀
+        maxFieldsSize: 2 * 1024 * 1024, // 文件上传大小，缺省2M
+        uploadDir: path.join(__dirname, 'public/upload/'), // 设置文件上传目录
+        onFileBegin: (name, file) => { // 文件上传前的设置
+            const fp = path.join(__dirname, 'public/upload/');
+            if (!fs.existsSync(fp)) { // 检查是否有“public/upload/”文件夹
+              fs.mkdirSync(fp); // 没有就创建
+            }
+        }
+    }
+}));
 
 app.use(async (ctx,next)=>{
     console.log(`Process ${ctx.request.method},${ctx.request.url}`);
@@ -52,7 +68,7 @@ router.get('/login', async (ctx, next) => {
     await next();
 });
 
-router.get('/api/getUser', async (ctx, next) => {
+router.get('/api/getUser/', async (ctx, next) => {
 
     function killNULL (origin) {
         let target = {};
@@ -74,7 +90,6 @@ router.get('/api/getUser', async (ctx, next) => {
             ? killNULL(ctx.request.query.search)
             : null
     }
-    // console.log(params);
     const res = await mysql.query(params);
     if (res) {
         console.log(res);
@@ -87,7 +102,7 @@ router.get('/api/getUser', async (ctx, next) => {
     await next();
 });
 
-router.get('/api/deleteUser', async (ctx, next) => {
+router.get('/api/deleteUser/', async (ctx, next) => {
     var id = ctx.request.query.id;
     const res = await mysql.remove(id);
     if (res) {
@@ -99,7 +114,7 @@ router.get('/api/deleteUser', async (ctx, next) => {
     await next();
 });
 
-router.post('/api/editUser', async (ctx, next) => {
+router.post('/api/editUser/', async (ctx, next) => {
     const params = ctx.request.body;
     const res = await mysql.edit(params);
     if (res) {
@@ -111,7 +126,7 @@ router.post('/api/editUser', async (ctx, next) => {
     await next();
 });
 
-router.post('/api/addUser', async (ctx, next) => {
+router.post('/api/addUser/', async (ctx, next) => {
     var name = ctx.request.body.name || '',
         password = ctx.request.body.password || '';
         res = await mysql.insert({name:name,password:password});
@@ -124,11 +139,25 @@ router.post('/api/addUser', async (ctx, next) => {
     await next();
 });
 
+router.post('/api/fileUpload/', async (ctx, next) => {
+    var id = ctx.request.body.id,
+        file = ctx.request.files.file,
+        filePath = path.extname(String(file.name));
+    const res = await mysql.upload({id:id,file:{file_name:file.name,file_path:file.path,file_type:filePath}});
+    if (res) {
+        console.log(res);
+        ctx.body = {
+            code:1,
+            msg:'上传文件成功'
+        };
+    }
+    await next();
+});
+
 router.post('/signin', async (ctx, next) => {
     
 });
 
-app.use(bodyParser());
 // add router middleware:
 app.use(router.routes());
 
